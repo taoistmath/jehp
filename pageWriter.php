@@ -16,6 +16,12 @@
                 } elseif ($color == 'red_anim') {
                     $status = "run_fail";
                     break;
+                } elseif ($color == 'aborted_anim') {
+                    $status = "run_bail";
+                    break;
+                } elseif ($color == 'aborted') {
+                    $status = "bailed";
+                    break;
                 } elseif ($color == 'blue_anim') {
                     $status = "run_pass";
                     break;
@@ -38,10 +44,13 @@
     $pageBody .= "td {padding:5px 5px 5px 5px;color:DDDDDD;text-shadow: 1px 1px 2px #000000;}\n";
     $pageBody .= ".passed {background-color:#00FF00;}\n";
     $pageBody .= ".failed {background-color:#FF0000;}\n";
+    $pageBody .= ".bailed {background-color:C0C0C0;}\n";
     $pageBody .= ".not_found {background-color:#FF7700;}\n";
     $pageBody .= ".run_pass {background-color:#00FF00;animation: blink 1s steps(5, start) infinite;";
     $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
     $pageBody .= ".run_fail {background-color:#FF0000;animation: blink 1s steps(5, start) infinite;";
+    $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
+    $pageBody .= ".run_bail {background-color:#C0C0C0;animation: blink 1s steps(5, start) infinite;";
     $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
     $pageBody .= "@keyframes blink { to { visibility: hidden; }}\n";
     $pageBody .= "@-webkit-keyframes blink { to { visibility: hidden; }}\n";
@@ -69,8 +78,16 @@
                         if ($mainStat=="passed") {
                             $mainStat = $valStat;
                         }
-                    case "run_fail":
+                    case "bailed":
                         if ($mainStat=="passed" || $mainStat=="run_pass") {
+                            $mainStat=$valStat;
+                        }
+                    case "run_bail":
+                        if ($mainStat=="passed" || $mainStat=="run_pass" || $mainStat=="bailed") {
+                            $mainStat=$valStat;
+                        }
+                    case "run_fail":
+                        if ($mainStat=="passed" || $mainStat=="run_pass" || $mainStat=="bailed" || $mainStat=="run_bail") {
                             $mainStat=$valStat;
                         }
                     case "failed":

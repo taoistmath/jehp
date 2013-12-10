@@ -27,11 +27,11 @@ teamCashCow[]=this_makes_less_but_still_lots_build3
 
 Order of Status Operation
 -------------------------
-Passed < Running Passed Previously
-Running Passed Previously < Aborted
-Aborted < Running Aborted Previously
-Running Aborted Previously < Running Failed Previously
-Running Failed Previously < Fail
+Passed < Running Passed Previously \n
+Running Passed Previously < Aborted\n
+Aborted < Running Aborted Previously\n
+Running Aborted Previously < Running Failed Previously\n
+Running Failed Previously < Fail\n
 
 Jenkins has 3 basic status returns. Those are blue (passed), aborted, and red (failed). Each of these return with "_anim" if the job is currently executing.
 Running jobs always take precedence in status, with the exception of failures, for group health. The reason for this is potential for change. If all of your jobs have passed but one is currently running you may have an aborted or failed job in the near future. If all of your jobs are failed but one is running, the rest of your jobs will still be in a failed state when it concludes.

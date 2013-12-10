@@ -39,3 +39,19 @@ Jenkins has 3 basic status returns. Those are blue (passed), aborted, and red (f
 Running jobs always take precedence in status, with the exception of failures, for group health. The reason for this is potential for change. If all of your jobs have passed but one is currently running you may have an aborted or failed job in the near future. If all of your jobs are failed but one is running, the rest of your jobs will still be in a failed state when it concludes.
 
 If you see a yellow cell appear that means a job in your config was not found in the xml Jenkins returned. The missing job name will be in the cell.
+
+Configuration
+-------------
+Set your Jenkins username, API token, and url in the config file.
+Add your build/job groupings to the groups.ini file (Php array formatting).
+
+If you use apache I'd recommend
+```
+Order deny,allow
+Deny from all
+```
+for all files except the quickHealth.html.
+
+Cron reportBuilder.sh
+
+

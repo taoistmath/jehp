@@ -1,0 +1,42 @@
+<html> 
+<head> 
+<style type="text/css">
+body {background-color:000000;}
+td {padding:5px 5px 5px 5px;color:DDDDDD;text-shadow: 1px 1px 2px #000000;}
+.passed {background-color:#00FF00;}
+.failed {background-color:#FF0000;}
+.bailed {background-color:C0C0C0;}
+.not_found {background-color:#FF7700;}
+.run_pass {background-color:#00FF00;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
+.run_fail {background-color:#FF0000;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
+.run_bail {background-color:#C0C0C0;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
+@keyframes blink { to { visibility: hidden; }}
+@-webkit-keyframes blink { to { visibility: hidden; }}
+</style>
+</head>
+<body>
+<table>
+<tr>
+<td id=missingJob class=not_found>Missing Job</td>
+</tr>
+<tr>
+<td id=passedJob class=passed>Group Pass</td>
+<tr>
+<tr>
+<td id=runningJobPass class=run_pass>Running Group Pass</td>
+</tr>
+<tr>
+<td id=adandonJob class=bailed>Group Abandoned</td>
+<tr>
+<tr>
+<td id=runningJobAbandon class=run_bail>Running Group Abandoned</td>
+</tr>
+<tr>
+<td id=runningJobFail class=run_fail>Running Group Fail</td>
+</tr>
+<tr>
+<td id=failedJob class=run_pass>Fail</td>
+</tr>
+</table>
+</body>
+</html>

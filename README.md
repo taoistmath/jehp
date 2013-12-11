@@ -4,16 +4,16 @@ jehp
 Jenkins Environment Health Page
 
 Simple Php page for checking team, environment, or other group build health in Jenkins at a glance.
-The entire intent of this project is to very quickly answer questions like "what's the status of 'x' in qa/stg?"
+The entire intent of this project is to very quickly answer questions like "what's the status of <your build> in qa/stg?"
 
-At initial commit, the config requires username, password, and the url for you Jenkins page.
-The groups.ini requires groupings you define. For example:
+At initial commit, the config requires username, password, and the url for your Jenkins page.
+The groups.ini requires groupings you define. For example, the array...
 ```
 qaEnv[]=qa_job1
 qaEnv[]=qa_job2
 qaEnv[]=qa_job3
 ```
-will give you a single table cell colored for worst possible health of the three jobs listed, labeled as qaEnv.
+...will give you a single cell, colored for worst possible health of the three jobs in the array, labeled as qaEnv.
 
 Mixing group names will not affect the order of displayed groups. So...
 ```

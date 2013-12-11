@@ -4,7 +4,7 @@ jehp
 Jenkins Environment Health Page
 
 Simple Php page for checking team, environment, or other group build health in Jenkins at a glance.
-The entire intent of this project is to very quickly answer questions like "what's the status of <your build> in qa/stg?"
+The entire intent of this project is to very quickly answer questions like "what's the status of [your build] in qa/stg?"
 
 At initial commit, the config requires username, password, and the url for your Jenkins page.
 The groups.ini requires groupings you define. For example, the array...

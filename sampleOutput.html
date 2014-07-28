@@ -1,42 +1,48 @@
 <html> 
 <head> 
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 <style type="text/css">
 body {background-color:000000;}
-td {padding:5px 5px 5px 5px;color:DDDDDD;text-shadow: 1px 1px 2px #000000;}
-.passed {background-color:#00FF00;}
+li a{text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}
+a:hover {text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}
+a:focus {text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}
+.passed {background-color:#2AC738;}
 .failed {background-color:#FF0000;}
-.bailed {background-color:C0C0C0;}
+.bailed {background-color:#FFD600;}
+.notbuilt {background-color:#FFD600;}
+.disabledbuild {background-color:#FFD600;}
+.unstable {background-color:#FFD600;}
 .not_found {background-color:#FF7700;}
-.run_pass {background-color:#00FF00;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
+.run_pass {background-color:#2AC738;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
 .run_fail {background-color:#FF0000;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
-.run_bail {background-color:#C0C0C0;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
+.run_bail {background-color:#FFD600;animation: blink 1s steps(5, start) infinite;-webkit-animation: blink 1s steps(5, start) infinite;}
 @keyframes blink { to { visibility: hidden; }}
 @-webkit-keyframes blink { to { visibility: hidden; }}
 </style>
 </head>
 <body>
-<table>
-<tr>
-<td id=missingJob class=not_found>Missing Job</td>
-</tr>
-<tr>
-<td id=passedJob class=passed>Group Pass</td>
-</tr>
-<tr>
-<td id=runningJobPass class=run_pass>Running Group Pass</td>
-</tr>
-<tr>
-<td id=adandonJob class=bailed>Group Abandoned</td>
-</tr>
-<tr>
-<td id=runningJobAbandon class=run_bail>Running Group Abandoned</td>
-</tr>
-<tr>
-<td id=runningJobFail class=run_fail>Running Group Fail</td>
-</tr>
-<tr>
-<td id=failedJob class=failed>Fail</td>
-</tr>
-</table>
+<div class="tabbable tabs-left">
+	<ul class="nav nav-tabs">
+		<li id="missingJob" class="not_found"><a href="#tab1" data-toggle="tab">Missing Job</a></li>
+		<li id="passedJob" class="passed"><a href="#tab2" data-toggle="tab">Group Pass</a></li>
+		<li id="runningJobPass" class="run_pass"><a href="#tab3" data-toggle="tab">Running Group Pass</a></li>
+		<li id="notBuiltJob" class="notbuilt"><a href="#tab4" data-toggle="tab">Not Built Job</a></li>
+		<li id="disabledJob" class="disabledbuild"><a href="#tab5" data-toggle="tab">Disabled Job</a></li>
+		<li id="abortedJob" class="bailed"><a href="#tab6" data-toggle="tab">Aborted Job</a></li>
+		<li id="runningJobAborted" class="run_bail"><a href="#tab7" data-toggle="tab">Running Aborted Job</a></li>
+		<li id="unstableJob" class="unstable"><a href="#tab8" data-toggle="tab">Unstable Job</a></li>
+		<li id="missingJob" class="run_fail"><a href="#tab9" data-toggle="tab">Running Group Fail</a></li>
+		<li id="failedJob" class="failed"><a href="#tab10" data-toggle="tab">Group Fail</a></li>
+	</ul>
+</div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+$('.nav-tabs a').click(function (e) {
+e.preventDefault();
+$(this).tab('show');
+});
+</script>
 </body>
 </html>

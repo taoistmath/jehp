@@ -36,7 +36,7 @@
                     $status = "notbuilt";
                     break;
 		} elseif ($color == 'disabled') {
-                    $status = "disabled";
+                    $status = "disabledbuild";
                     break;
 		} elseif ($color == 'yellow') {
                     $status = "unstable";
@@ -51,44 +51,105 @@
         return $status;
     }
 
+    function insertSubTabContent($jobsInGroup, $tabNumber){
+        global $pageBody;
+        $count = 1;
+        foreach($jobsInGroup as $index => $value){
+            $pageBody .= "\t\t\t\t\t<div class=\"tab-pane active in\" id=\"subtab" . $tabNumber . $count . "\">";
+            //$pageBody .= "<p>" . $value . "</p>";   //for future content inside subtab
+            $pageBody .= "</div>\n";
+            $count = $count + 1;
+        }
+
+    }
+
+    function insertTabContent($jobStatuses){
+        $count = 1;
+        global $pageBody, $grpList;
+        foreach($grpList as $key => $block) {
+            
+            if($count == 1){
+                $pageBody .= "\t\t<div class=\"tab-pane active in\" id=\"tab" . $count . "\">\n";
+            }
+            else{
+                $pageBody .= "\t\t<div class=\"tab-pane\" id=\"tab" . $count . "\">\n";
+            }
+            
+            //$pageBody .= "<div class=\"tab-pane active in\" id=\"set" . $count . "\">";
+            $pageBody .= "\t\t\t<div class=\"tabbable tabs-left\">\n";
+            $pageBody .= "\t\t\t\t<ul class=\"nav nav-tabs\">\n";
+            $subcount = 1;
+            foreach($block as $index => $value) {
+                if($subcount == 1){
+                    $pageBody .= "\t\t\t\t\t<li class =\"active " . $jobStatuses[$count-1][$subcount-1] ."\" >" . "<a href=\"#subtab" . $count . $subcount . "\">" . $value . "</a></li>\n";
+                }
+                else{
+                    $pageBody .= "\t\t\t\t\t<li class =\"" . $jobStatuses[$count-1][$subcount-1] . "\">" . "<a href=\"#subtab" . $count . $subcount . "\">" . $value . "</a></li>\n";
+                }
+                //$pageBody .= "<li>" . "<a href=\"#subtab" . $count . $subcount . "\">" . $value . "</a></li>\n";
+                $subcount = $subcount + 1;
+            }
+
+            $pageBody .= "\t\t\t\t</ul>\n";
+            $pageBody .= "\t\t\t\t<div class = \"tab-content\">\n";
+            insertSubTabContent($block, $count);
+            $pageBody .= "\t\t\t\t</div>\n";
+            $pageBody .= "\t\t\t</div>\n";
+            $pageBody .= "\t\t</div>\n";
+            $count = $count + 1;
+        }
+    }
+
+
+
+
     $pageBody = "<html> \n";
     $pageBody .= "<head> \n";
+    $pageBody .= "<title>JEHP</title>\n";
+    $pageBody .= "<meta http-equiv=\"refresh\" content=\"60; url=index.php\">\n";
+    $pageBody .= "<link href=\"css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n";
     $pageBody .= "<style type=\"text/css\">\n";
-    $pageBody .= "body {background-color:000000;}\n";
-    $pageBody .= "td {padding:5px 5px 5px 5px;color:DDDDDD;text-shadow: 1px 1px 2px #000000;}\n";
-    $pageBody .= ".passed {background-color:#00FF00;}\n";
+    $pageBody .= "body {background-color:#000000;}\n";
+    $pageBody .= "li a{text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}\n";
+    $pageBody .= "a:hover {text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}\n";
+    $pageBody .= "a:focus {text-align:center; color:#FFFFFF;text-shadow: 1px 1px 2px #000000;}\n";
+    $pageBody .= ".passed {background-color:#2AC738;}\n";
     $pageBody .= ".failed {background-color:#FF0000;}\n";
-    $pageBody .= ".bailed {background-color:#C0C0C0;}\n";
-    $pageBody .= ".notbuilt {background-color:#D3D3D3;}\n";
-    $pageBody .= ".disabled {background-color:#D3D3D3;}\n";
-    $pageBody .= ".unstable {background-color:#FFFF00;}\n";
+    $pageBody .= ".bailed {background-color:#FFD600;}\n";
+    $pageBody .= ".notbuilt {background-color:#FFD600;}\n";
+    $pageBody .= ".disabledbuild {background-color:#FFD600;}\n";
+    $pageBody .= ".unstable {background-color:#FFD600;}\n";
+
     $pageBody .= ".not_found {background-color:#FF7700;}\n";
-    $pageBody .= ".run_pass {background-color:#00FF00;animation: blink 1s steps(5, start) infinite;";
+    $pageBody .= ".run_pass {background-color:#2AC738;animation: blink 1s steps(5, start) infinite;";
     $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
     $pageBody .= ".run_fail {background-color:#FF0000;animation: blink 1s steps(5, start) infinite;";
     $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
-    $pageBody .= ".run_bail {background-color:#C0C0C0;animation: blink 1s steps(5, start) infinite;";
+    $pageBody .= ".run_bail {background-color:#FFD600;animation: blink 1s steps(5, start) infinite;";
     $pageBody .= "-webkit-animation: blink 1s steps(5, start) infinite;}\n";
     $pageBody .= "@keyframes blink { to { visibility: hidden; }}\n";
     $pageBody .= "@-webkit-keyframes blink { to { visibility: hidden; }}\n";
     $pageBody .= "</style>\n";
     $pageBody .= "</head>\n";
     $pageBody .= "<body>\n";
-    $pageBody .= "<table>\n";
+    $pageBody .= "<div class=\"tabbable tabs-left\">\n";
+    $pageBody .= "\t<ul class=\"nav nav-tabs\">\n";
 
     $curKey = '';
     $pass = false;
-
+    $count = 1;
+    $jobStatuses = array();
     foreach($grpList as $key => $block) {
-        $pageBody .= "<tr>\n";
         $mainStat="passed";
+        $newArray = array();
         foreach($block as $index => $value) {
             $valStat = get_job_status($jobs,$value);
+            $newArray[] = $valStat;
             if ($curKey != $key) {
                 $curKey = $key;
             }
             if ($valStat == "not_found") {
-                $pageBody .= "<td id=" . $key . " class=not_found>" . $value . "</td>\n";
+                $pageBody .= "\t\t<li id=\"" . $key . "\" class=\"not_found\">" . $value . "</li>\n";
             } else {
                 switch($valStat){
                     case "run_pass":
@@ -99,7 +160,7 @@
                         if ($mainStat=="passed" || $mainStat=="run_pass") {
                             $mainStat=$valStat;
                         }
-                    case "disabled":
+                    case "disabledbuild":
                         if ($mainStat=="passed" || $mainStat=="run_pass") {
                             $mainStat=$valStat;
                         } 
@@ -124,13 +185,30 @@
                }
             }
         }
-        $pageBody .= "</tr>\n";
-        $pageBody .= "<td id=" . $key . " class=" . $mainStat . ">" . $key . "</td>\n";
+
+        $jobStatuses[] = $newArray;
+        
+        $pageBody .= "\t\t<li id=\"" . $key . "\" class=\"" . $mainStat . "\">" . "<a href=\"#tab" . $count . "\" data-toggle=\"tab\">" . $key . "</a></li>\n";
+        $count = $count + 1;
     }
 
-    $pageBody .= "</tr>\n";
-    $pageBody .= "</table>\n";
+    $pageBody .= "\t</ul>\n";
+    $pageBody .= "\t<div class=\"tab-content\">\n";
+    insertTabContent($jobStatuses);
+    $pageBody .= "\t</div>\n";
+    $pageBody .= "</div>\n";
+    $pageBody .= "<script src=\"http://code.jquery.com/jquery.js\"></script>\n";
+    $pageBody .= "<script src=\"js/bootstrap.min.js\"></script>\n";
+
+
+    $pageBody .= "<script>\n";
+    $pageBody .= "$('.nav-tabs a').click(function (e) {\n";
+    $pageBody .= "e.preventDefault();\n";
+    $pageBody .= "$(this).tab('show');\n";
+    $pageBody .= "});\n";
+    $pageBody .= "</script>\n";
+
     $pageBody .= "</body>\n";
-    $pageBody .= "</html>";
+    $pageBody .= "</html>\n";
     file_put_contents($finalPage,$pageBody);
 ?>

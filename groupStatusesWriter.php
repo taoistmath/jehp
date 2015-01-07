@@ -1,34 +1,120 @@
 <?php
 
-    $params = parse_ini_file('config');
-    $allValues = array_values($params);
-    $USER = $allValues[0];
-    $PASSWORD = $allValues[1];
-    $SITE = $allValues[2];
-
-    $URL = "https://$USER:$PASSWORD@$SITE/api/xml";
-
-    if($xml = file_get_contents($URL))
-    {
-        if(!file_exists('results/status.xml'))
-        {
-            mkdir('results', 0777, true);
-        }
-        file_put_contents('results/status.xml' , $xml);
-    }    
-    else
-    {
-        exit('Could not get xml');
+    function get_values(){
+      $params = parse_ini_file('config');
+      return array_values($params);
     }
 
+    function get_user(){
+        return get_values()[0];
+    }
 
-    $finalPage = 'json/allJobs.json';
-    $grpList = parse_ini_file('groups.ini');
+    function get_pass(){
+        return get_values()[1];
+    }
 
-    if (file_exists('results/status.xml')) {
-        $jobs = simplexml_load_file('results/status.xml');
-    } else {
+    function get_site(){
+        return get_values()[2];
+    }
+
+    function get_url(){
+      return "https://".get_user().":".get_pass()."@".get_site()."/api/xml";
+    }
+
+    function prior_check($jobName) {
+        if(file_exists('results/fails.xml')){
+            $pastFails = simplexml_load_file('results/fails.xml');
+        } else {
+            touch('results/fails.xml');
+            chmod('results/fails.xml', 0777);
+            $pastFails = simplexml_load_file('results/fails.xml');
+        }
+        
+        if($pastFails){
+          foreach ($pastFails as $results) {
+            if($jobName == $results->name) {
+              return true;
+            }
+          }
+        }
+        return false;
+    }
+
+    function get_culprit($jobName) {      
+      if($xml = simplexml_load_file('https://'.get_user().':'.get_pass().'@'.get_site().'/job/'.$jobName.'/lastFailedBuild/api/xml')) {
+          if(isset($xml->culprit->fullName)){
+            $culprit = $xml->culprit->fullName;
+          } else {
+            $culprit = "No culprit";
+          }
+      } else {
+          $culprit = $jobName." appears to be in good shape.";
+      }
+      return $culprit;
+    }
+
+    function add_fail($jobName) {
+      $culprit = get_culprit($jobName);
+
+      $pastFails = simplexml_load_file('results/fails.xml');
+      $failJobs = $pastFails->jobs;
+      
+      if($failJobs){
+        $failJobs = $jobs->addChild('job');
+        $jobs->addChild('name', $jobName);
+        $jobs->addChild('culprit', $culprit);  
+      }
+
+      $failJobs->asXML('results/fails.xml');
+      add_status_culprit($jobName);
+    }
+
+    function get_status_culprit($jobName) {
+        $xml = simplexml_load_file('results/status.xml');
+
+        foreach($xml->job as $segs){
+          if(trim($segs->name) == trim($jobName)) {
+            $culprit = $segs->culprit;
+          }
+        }
+        if($culprit){
+          return $culprit;    
+        } else {
+          return get_culprit($jobName);
+        }
+        
+    }
+
+    function add_status_culprit($jobName) {
+      if (file_exists('results/status.xml')) {
+        $currentJobs = simplexml_load_file('results/status.xml');
+      } else {
         exit('Failed to open results/status.xml');
+      }
+
+      foreach($currentJobs->job as $segs){
+        if(trim($segs->name) == trim($jobName)) {
+          $seg=$segs->addChild('culprit',get_culprit($jobName));
+        }
+      }
+      
+      $currentJobs->asXML('results/status.xml');
+    }
+
+    function remove_fail($name){
+        $pastFails = simplexml_load_file('results/fails.xml');
+        $segs=$pastFails->xpath('//job[@name="$name"]');
+        if (count($segs)>=1) {
+          $seg=$segs[0];
+        }
+
+        $pastFails->asXML('results/fails.xml');
+    }
+
+    function prior_dump($jobName) {
+        if(prior_check($jobName)){
+            remove_fail($jobName);
+        }
     }
 
     function get_job_status($results, $jobName){
@@ -39,9 +125,15 @@
             if ($jobName == $name) {
                 if ($color == 'red') {
                     $status = "failed";
+                    if(!prior_check($name)){
+                        add_fail($name);
+                    }
                     break;
                 } elseif ($color == 'red_anime') {
                     $status = "run_fail";
+                    if(!prior_check($name)){
+                        add_fail($name);
+                    }
                     break;
                 } elseif ($color == 'aborted_anime') {
                     $status = "run_bail";
@@ -54,6 +146,7 @@
                     break;
                 } elseif ($color == 'blue') {
                     $status = "passed";
+                    prior_dump($name);
                     break;
                 } elseif ($color == 'notbuilt') {
                     $status = "notbuilt";
@@ -74,6 +167,27 @@
             $status = "not_found";
         }
         return $status;
+    }
+
+    $url = get_url();
+    if($xml = file_get_contents($url)){
+        if(!file_exists('results/status.xml'))
+        {
+            mkdir('results', 0777, true);
+        }
+        file_put_contents('results/status.xml' , $xml);
+    } else {
+        exit('Could not get xml');
+    }
+
+
+    $finalPage = 'json/allJobs.json';
+    $grpList = parse_ini_file('groups.ini');
+
+    if (file_exists('results/status.xml')) {
+        $jobs = simplexml_load_file('results/status.xml');
+    } else {
+        exit('Failed to open results/status.xml');
     }
 
     $groups = "";
@@ -97,7 +211,7 @@
 
         foreach($block as $index => $value) {
             $valStat = get_job_status($jobs,$value);
-            $jobList .= "\t\t{\"name\": \"" . $value . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
+            $jobList .= "\t\t{\"name\": \"" . $value . "\", \"culprit\": \"" . get_status_culprit($value) . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
             if ($curKey != $key) {
                 $curKey = $key;
             }

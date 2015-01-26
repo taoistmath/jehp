@@ -190,11 +190,17 @@
         exit('Failed to open results/status.xml');
     }
 
+    $groupRed = "";
+    $groupGreen = "";
+    $groupYellow = "";
     $groups = "";
     $groups .= "\"groups\": [\n";
 
     $jobList = "";
     $jobList = "\"jobs\": [\n";
+    $jobListRed = "";
+    $jobListYellow = "";
+    $jobListGreen = "";
 
     $curKey = '';
     $pass = false;
@@ -211,7 +217,17 @@
 
         foreach($block as $index => $value) {
             $valStat = get_job_status($jobs,$value);
-            $jobList .= "\t\t{\"name\": \"" . $value . "\", \"culprit\": \"" . get_status_culprit($value) . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
+             
+            if($valStat == "failed" || $valStat == "run_fail") {
+                 $jobListRed .= "\t\t{\"name\": \"" . $value . "\", \"culprit\": \"" . get_status_culprit($value) . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
+            }
+            elseif($valStat == "passed" || $valStat == "run_pass") {
+                $jobListGreen .= "\t\t{\"name\": \"" . $value . "\", \"culprit\": \"" . get_status_culprit($value) . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
+            }
+            else {
+                $jobListYellow .= "\t\t{\"name\": \"" . $value . "\", \"culprit\": \"" . get_status_culprit($value) . "\", \"status\": \"" . $valStat . "\", \"group\": \"" . $key . "\", \"subtabid\": \"". $count . $subcount .  "\"},\n";
+            }
+            
             if ($curKey != $key) {
                 $curKey = $key;
             }
@@ -276,14 +292,25 @@
                         break;
                 }
         }
-
-        $groups .= "\t\t{\"name\": \"" . $key . "\", \"status\": \"" . $statusArray[$worstJobStatus] . "\", \"count\": \"" . $count . "\"},\n";
+         
+        if($statusArray[$worstJobStatus] == "failed" || $statusArray[$worstJobStatus] == "run_fail") {
+            $groupRed .= "\t\t{\"name\": \"" . $key . "\", \"status\": \"" . $statusArray[$worstJobStatus] . "\", \"count\": \"" . $count . "\"},\n";
+        }
+        elseif($statusArray[$worstJobStatus] == "passed" || $statusArray[$worstJobStatus] == "run_pass") {
+            $groupGreen .= "\t\t{\"name\": \"" . $key . "\", \"status\": \"" . $statusArray[$worstJobStatus] . "\", \"count\": \"" . $count . "\"},\n";
+        }
+        else {
+            $groupYellow .= "\t\t{\"name\": \"" . $key . "\", \"status\": \"" . $statusArray[$worstJobStatus] . "\", \"count\": \"" . $count . "\"},\n";
+        }
         $count = $count + 1;
     }
-    $groups = substr($groups, 0, -2); //cut off extra new line and comma at the end
-    $jobList = substr($jobList, 0, -2); //cut off extra new line and comma at the end
-    $groups .= "\n\t]\n";
+    
+    $groupGreen = substr($groupGreen, 0, -2);//cut off extra new line and comma at the end
+    $jobListGreen = substr($jobListGreen, 0, -2); 
+    $jobList .= $jobListRed . $jobListYellow . $jobListGreen;
     $jobList .= "\n\t]\n";
+    $groups .= $groupRed . $groupYellow . $groupGreen;
+    $groups .= "\n\t]\n";
     $mainJson = "";
     $mainJson .= "{\n\t" . $groups . ",\n\t" . $jobList . "}\n";
     file_put_contents($finalPage,$mainJson);

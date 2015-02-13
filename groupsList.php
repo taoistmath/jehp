@@ -4,6 +4,8 @@ class GroupsList {
     private $groupGreen = "";
     private $groupYellow = "";
     private $groups = "\"groups\": [\n";
+    private $groupGreenOnly = "\"groupGreenOnly\": [\n";
+    private $groupFailOnly = "\"groupFailOnly\": [\n";
     private $statusArray = array("passed", "run_pass", "notbuilt", "disabledbuild", "bailed", "run_bail", "unstable", "run_unstable", "failed", "run_fail");
     
     public function setJobListings($key, $status, $count) {
@@ -26,11 +28,22 @@ class GroupsList {
         }
     }
 
-    public function groupConcat() {
-        $this->groupGreen = substr($this->groupGreen, 0, -2);
-        $this->groups .= $this->groupRed . $this->groupYellow . $this->groupGreen;
-        $this->groups .= "\n\t]\n";
-        return $this->groups;
+    public function groupGreenOnly() {
+        $this->groupGreenOnly = substr($this->groupGreenOnly, 0, -2);
+        $this->groupGreenOnly .= "\n\t]\n";
+        return $this->groupGreenOnly;
+    }
+
+    public function groupFailOnly() {
+        if(empty($groupYellow)) {
+            $this->groupRed = substr($this->groupRed, 0, -2);
+            $this->groupFailOnly .= $this->groupRed;
+        } else {
+            $this->groupYellow = substr($this->groupYellow, 0, -2);
+            $this->groupFailOnly .= $this->groupRed . $this->groupYellow;
+        }
+         $this->groupFailOnly .= "\n\t]\n";
+         return $this->groupFailOnly;
     }
 
     public function groupsListings() {
@@ -106,6 +119,7 @@ class GroupsList {
                 break;
             case "passed": 
             case "run_pass": 
+                $this->groupGreenOnly .= $this->setJobListings($key, $this->statusArray[$worstJobStatus], $count);
                 $this->groupGreen .= $this->setJobListings($key, $this->statusArray[$worstJobStatus], $count);
                 break;
             default: 

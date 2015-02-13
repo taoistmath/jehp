@@ -43,25 +43,22 @@ div.culprit {color:#FFD600;background-color:#000000;}
 
 <div class="tabbable tabs-left" data-ng-controller= "JobCtrl">
     <ul class="nav nav-tabs">
-        <li data-ng-repeat="grpFail in groupFailOnly"  id="{{grpFail.name}}" class="{{grpFail.status}}" ng-class="{active: $index == activeTab}">
+        <li class="passed">
+            <a href="/jehpDisplay.html">Collapse</a>
+        </li>   
+        <li data-ng-repeat="grpPass in groupGreenOnly"  id="{{grpPass.name}}" class="{{grpPass.status}}" ng-class="{active: $index == activeTab}">
             <a ng-click="switchToTab($index)" data-toggle="tab">
-                {{grpFail.name}}
+                {{grpPass.name}}
             </a>
         </li>
-        <li class="passed">
-            <a href="/jehpDisplayAllJobs.html">Passed</a>
-        </li>           
     </ul>
-    <div class="tab-content">
-      <div class="tab-pane fade in" data-ng-repeat="grpFail in groupFailOnly" ng-class="{active: $index == activeTab}" >
+  <div class="tab-content">
+      <div class="tab-pane fade in" data-ng-repeat="grpPass in groupGreenOnly" ng-class="{active: $index == activeTab}" >
           <div class="tabbable tabs-left">
               <ul class="nav nav-tabs">
-                  <li data-ng-repeat="job in jobs" ng-if="job.group == $parent.grpFail.name" class="{{job.status}}" ng-class="{active: $index == activeSubTab}">
+                  <li data-ng-repeat="job in jobs" ng-if="job.group == $parent.grpPass.name" class="{{job.status}}" ng-class="{active: $index == activeSubTab}">
                       <a ng-click="switchToSubTab($index)" data-toggle="tab">
                             {{job.name}}
-                          <div class="tab-pane fade in culprit" ng-class="{active: $index == activeSubTab}">
-                                {{job.culprit}}
-                          </div>
                       </a>
                   </li>
               </ul>
@@ -69,7 +66,6 @@ div.culprit {color:#FFD600;background-color:#000000;}
       </div>   
   </div>
 </div>
-
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="js/bootstrap.min.js"></script>
 </body>

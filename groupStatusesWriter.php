@@ -15,7 +15,7 @@ $groupsLst = new GroupsList;
 $groupsLst->groupsListings();
 
 $mainJson = "";
-$mainJson .= "{\n\t" . $groupsLst->groupConcat() . ",\n\t" . $jobLst->jobConcat() . "}\n";
+$mainJson .= "{\n\t" . $groupsLst->groupFailOnly() . ",\n\t" . $groupsLst->groupGreenOnly() . ",\n\t" . $jobLst->jobConcat() . "}\n";
 file_put_contents('json/allJobs.json',$mainJson);
 ?>
 

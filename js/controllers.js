@@ -29,7 +29,8 @@ jehpControllers.controller('JobCtrl', function($scope, $http, $timeout, dataServ
         //success
         function(data){
             $scope.jobs = data.jobs;
-            $scope.groups = data.groups;
+            $scope.groupGreenOnly = data.groupGreenOnly;
+            $scope.groupFailOnly = data.groupFailOnly;
         },
         //failure
         function(){
@@ -40,7 +41,8 @@ jehpControllers.controller('JobCtrl', function($scope, $http, $timeout, dataServ
         dataService.calculateJson();
         $http.get('json/allJobs.json').success(function(data) {
             $scope.tempJobs = data.jobs;
-            $scope.tempGroups = data.groups;
+            $scope.tempGroupGreen = data.groupGreenOnly;
+            $scope.tempGroupFail = data.groupFailOnly;
 
             //update jobs if they have changed
             if(angular.equals($scope.tempJobs, $scope.jobs) == false)
@@ -48,10 +50,14 @@ jehpControllers.controller('JobCtrl', function($scope, $http, $timeout, dataServ
                 $scope.jobs = $scope.tempJobs;
             }
 
-            //update groups if they have changed
-            if(angular.equals($scope.tempGroups, $scope.groups) == false)
+            if(angular.equals($scope.tempGroupGreen, $scope.groupGreenOnly) == false)
             {
-                $scope.groups = $scope.tempGroups;
+                $scope.groupGreenOnly = $scope.tempGroupGreen;
+            }
+           
+            if(angular.equals($scope.tempGroupFail, $scope.groupFailOnly) == false)
+            {
+                $scope.groupFailOnly = $scope.tempGroupFail;
             }
         })
         .error(function(){
